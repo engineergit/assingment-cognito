@@ -1,0 +1,33 @@
+$body-background-color: #f2f2f2;
+$base-color: #009345;
+$base-color-alt: #94c845;
+$text-color: #333;
+$hover-transition: color 0.3s ease-in-out;
+$hamburger-transition: all 0.22s ease-in-out;
+
+.page-container {
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+  transition: $hover-transition;
+  color: $text-color;
+
+  &:hover {
+    color: $base-color;
+  }
+
+  &.link {
+    color: $base-color;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    display: block;
+    text-transform: none;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+}
