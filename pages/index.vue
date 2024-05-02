@@ -16,93 +16,67 @@
 definePageMeta({ layout: 'site', auth: false });
 //const { token } = useAuthState();
 const headers = useRequestHeaders(['cookie']) as HeadersInit;
+const { status } = useAuth();
 
 import {
   CognitoIdentityProviderClient,
-  AddCustomAttributesCommand,
   UpdateUserAttributesCommand,
-  type UpdateUserAttributesCommandInput,
-  type AddCustomAttributesCommandInput
+  type UpdateUserAttributesCommandInput
 } from '@aws-sdk/client-cognito-identity-provider';
 import * as AWS from 'aws-sdk';
 
-const token = computed(() => useCookie('next-auth.session-token').value);
+// const token = computed(() => useCookie('next-auth.session-token').value);
 
-const { data } = useAuth(); // Access auth data
+// const credentials = new AWS.Credentials({
+//   accessKeyId: process.env.accessKeyId,
+//   secretAccessKey: process.env.secretAccessKey
+// });
 
-const credentials = new AWS.Credentials({
-   accessKeyId: process.env.accessKeyId,
-  secretAccessKey: process.env.secretAccessKey
-});
+// const client = new CognitoIdentityProviderClient({
+//   region: process.env.location,
+//   credentials
+// });
 
-const client = new CognitoIdentityProviderClient({
-  region: process.env.location,
-  credentials
-});
-
-//p@ssw0rD
-const input: UpdateUserAttributesCommandInput = {
-  // UpdateUserAttributesRequest
-  UserAttributes: [
-    // AttributeListType // required
-    {
-      // AttributeType
-      Name: 'country', // required
-      Value: 'countryx'
-    }
-  ],
-  AccessToken: token.value as string,
-  ClientMetadata: {}
-};
-const command = new UpdateUserAttributesCommand(input);
-
-// const input: AddCustomAttributesCommandInput = {
-//   // AddCustomAttributesRequest
-//   UserPoolId: 'eu-north-1_wlpZ3dcAp', // required
-//   CustomAttributes: [
-//     // CustomAttributesListType // required
+// //p@ssw0rD
+// const input: UpdateUserAttributesCommandInput = {
+//   // UpdateUserAttributesRequest
+//   UserAttributes: [
+//     // AttributeListType // required
 //     {
-//       // SchemaAttributeType
-//       Name: 'todos',
-//       AttributeDataType: 'String',
-//       DeveloperOnlyAttribute: false,
-//       Mutable: true,
-//       Required: false,
-//       NumberAttributeConstraints: {
-//         // NumberAttributeConstraintsType
-//         MinValue: '1',
-//         MaxValue: '1'
-//       },
-//       StringAttributeConstraints: {
-//         // StringAttributeConstraintsType
-//         MinLength: '3',
-//         MaxLength: ''
-//       }
+//       // AttributeType
+//       Name: 'country', // required
+//       Value: 'countryx'
 //     }
-//   ]
+//   ],
+//   AccessToken: token.value as string,
+//   ClientMetadata: {}
 // };
-// const command = new AddCustomAttributesCommand(input);
+// const command = new UpdateUserAttributesCommand(input);
 
-async function addCustomAttribute() {
-  try {
-    console.log('clicked');
-    console.log(token);
-    const response = await client.send(command);
-    console.log(response);
-  } catch (ex) {
-    console.log(ex);
-  }
-}
+// async function addCustomAttribute() {
+//   try {
+//     console.log('clicked');
+//     console.log(token);
+//     const response = await client.send(command);
+//     console.log(response);
+//   } catch (ex) {
+//     console.log(ex);
+//   }
+// }
 
 const attributesStore: any = ref({});
 
 onMounted(async () => {
   try {
-    const response = await $fetch(`/api/attributes`, {
-      baseURL: '/',
-      method: 'get'
-    });
-    attributesStore.value = response;
+    if (status.value === 'authenticated') {
+      const response = await $fetch(`/api/attributes`, {
+        baseURL: '/',
+        method: 'get'
+      });
+      attributesStore.value = response;
+    } else {
+      return;
+    }
   } catch (ex) {}
 });
 </script>

@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'site', title: 'register', auth: false });
-import { userPool } from '~/server/util/cognito';
+const { status } = useAuth();
 import { CognitoUserAttribute } from 'amazon-cognito-identity-js';
 
 const attributeList: Array<CognitoUserAttribute> = [];
@@ -92,36 +92,22 @@ const customAttributesPayload = ref({
   recipes: []
 });
 
-const requiredRules = [
-  (value: any) => {
-    if (value) return true;
-    return 'value is required';
-  }
-];
-
-const emailRules = [
-  (value: any) => {
-    if (value) return true;
-    return 'value is required';
-  },
-  (value: any) => {
-    if (/.+@.+\..+/.test(value)) return true;
-    return 'E-mail must be valid.';
-  }
-];
-
 async function register() {
   try {
-    loading.value = true;
-    const response = await $fetch(`/api/attributes`, {
-      baseURL: '/',
-      method: 'post',
-      body: { ...customAttributesPayload.value }
-    });
-    customAttributesPayload.value.songs = [];
-    customAttributesPayload.value.todos = [];
-    customAttributesPayload.value.recipes = [];
-    useRouter().push('/');
+    if (status.value === 'authenticated') {
+      loading.value = true;
+      const response = await $fetch(`/api/attributes`, {
+        baseURL: '/',
+        method: 'post',
+        body: { ...customAttributesPayload.value }
+      });
+      customAttributesPayload.value.songs = [];
+      customAttributesPayload.value.todos = [];
+      customAttributesPayload.value.recipes = [];
+      useRouter().push('/');
+    } else {
+      return;
+    }
   } catch (ex) {
   } finally {
     loading.value = false;
